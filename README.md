@@ -4,7 +4,9 @@ MongoDB, Express, React, Node.js
 
 ## 설치 패키지
 
-date FNS, uuid
+date-fns, uuid
+
+> 날짜를 원하는 형태로 파싱해주는 라이브러리 & 고유식별자 생성기(v4: 랜덤값)
 
 ```bash
 yarn add date-fns uuid
