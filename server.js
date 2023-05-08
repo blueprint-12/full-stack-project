@@ -26,6 +26,7 @@ app.use("/", express.static(path.join(__dirname, "public")));
 
 app.use("/", require("./routes/root"));
 app.use("/users", require("./routes/userRoutes"));
+app.use("/notes", require("./routes/noteRoutes"));
 
 // 서버 수준에 있기 때문에 폴더 밖으로 나갈필요 x
 

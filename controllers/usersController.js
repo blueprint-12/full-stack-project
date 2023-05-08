@@ -10,7 +10,7 @@ const bcrypt = require("bcrypt");
 const getAllUsers = asyncHandler(async (req, res) => {
   //find, select, lean 메서드는 mongoose의 메서드
   const users = await User.find().select("-password").lean();
-  if (!users) {
+  if (!users?.length) {
     return res.status(400).json({ message: "No users found" });
   }
   res.json(users);
@@ -25,7 +25,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 
   //TODO: confirm DATA
   // Array.isArray(인자) 인자가 Array인지 확인 return boolean
-  if ((!username || !password || !Array, isArray(roles) || !roles.length)) {
+  if (!username || !password || !Array.isArray(roles) || !roles.length) {
     return res.status(400).json({ message: "All fields are required" });
   }
   // TODO: Check for duplicate(중복 방지)
@@ -102,7 +102,31 @@ const updateUser = asyncHandler(async (req, res) => {
 // @route DELETE /user:id
 // @access Private
 
-const deleteUser = asyncHandler(async (req, res) => {});
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(400).json({ message: "user ID required" });
+  }
+  //유저를 삭제하기 전에 특정 사용자의 존재 notes를 확인해야 한다.
+
+  const note = await Note.findOne({ user: id }).lean().exec();
+  if (note) {
+    return res
+      .status(400)
+      .json({ message: "유저에게 할당된 노트가 존재합니다." });
+  }
+
+  const user = await User.findById(id).exec();
+  if (!user) {
+    return res.status(400).json({ message: "해당 유저가 존재하지 않습니다." });
+  }
+
+  const result = await user.deleteOne();
+
+  const reply = `ID가 ${result._id}인 유저 ${result.username}가 성공적으로 삭제되었습니다. `;
+
+  res.json({ message: reply }); // 200 OK 시
+});
 
 module.exports = {
   getAllUsers,
