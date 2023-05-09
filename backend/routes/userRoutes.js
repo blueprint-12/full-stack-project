@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const userController = require("../controllers/usersController");
+const userController = require('../controllers/usersController');
 
 router
-  .route("/")
+  .route('/')
   .get(userController.getAllUsers)
   .post(userController.createNewUser)
   .patch(userController.updateUser)
