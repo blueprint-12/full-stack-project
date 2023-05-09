@@ -1,6 +1,12 @@
-# full-stack-project
+# full-stack-project-backend
 
-MongoDB, Express, React, Node.js
+MongoDB, Express, Node.js
+
+## 실행 방법
+
+```bash
+yarn && yarn dev
+```
 
 ## 설치 패키지
 
