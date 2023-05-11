@@ -13,7 +13,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
          validateStatus: (response, result) => {
             return response.status === 200 && !result.isError;
          },
-         keepUnusedDataFor: 5, //5s
+         // keepUnusedDataFor: 5, //5초마다 api를 콜해서 데이터를 가져오게 된다. -> 기본값은 60초
          transformResponse: (responseData) => {
             const loadedUsers = responseData.map((user) => {
                user.id = user._id;
@@ -30,10 +30,48 @@ export const usersApiSlice = apiSlice.injectEndpoints({
             } else return [{ type: "User", id: "LIST" }];
          },
       }),
+      //addNewUser은 mutation을 쓴다.
+      addNewUser: builder.mutation({
+         query: (initialUserData) => ({
+            url: "/users",
+            method: "POST",
+            body: {
+               ...initialUserData,
+            },
+         }),
+         invalidatesTags: [{ type: "User", id: "LIST" }],
+      }),
+      updateUser: builder.mutation({
+         query: (initialUserData) => ({
+            url: "/users",
+            method: "PATCH",
+            body: {
+               ...initialUserData,
+            },
+         }),
+         invalidatesTags: (result, error, arg) => [
+            { type: "User", id: arg.id },
+         ],
+      }),
+      deleteUser: builder.mutation({
+         query: ({ id }) => ({
+            url: `/users`,
+            method: "DELETE",
+            body: { id },
+         }),
+         invalidatesTags: (result, error, arg) => [
+            { type: "User", id: arg.id },
+         ],
+      }),
    }),
 });
 
-export const { useGetUsersQuery } = usersApiSlice;
+export const {
+   useGetUsersQuery,
+   useAddNewUserMutation,
+   useUpdateUserMutation,
+   useDeleteUserMutation,
+} = usersApiSlice;
 
 // returns the query result object
 export const selectUsersResult = usersApiSlice.endpoints.getUsers.select();
@@ -46,6 +84,7 @@ const selectUsersData = createSelector(
 
 //getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
+   //Ids는 배열
    selectAll: selectAllUsers,
    selectById: selectUserById,
    selectIds: selectUserIds,
